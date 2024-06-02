@@ -11,8 +11,8 @@ export interface IUser {
 
 export interface IUsers {
   id: number;
-  next: number;
-  previous: number;
+  next: string;
+  previous: string;
   results: IUser[];
 }
 
@@ -32,7 +32,7 @@ export interface IFile {
 
 export interface IStorageFiles {
   id: number;
-  next: number;
-  previous: number;
+  next: string;
+  previous: string;
   results: IFile[];
 }
