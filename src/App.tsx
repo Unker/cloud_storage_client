@@ -1,17 +1,16 @@
 import './App.css'
 import { BrowserRouter } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
-import Example from './components/Temp'
+import AppRouter from './components/AppRouter'
 
 function App() {
  
   return (
     <BrowserRouter>
       <div className="container mx-auto">
-        {/* <Header />
+        {/* <Header /> */}
         <AppRouter />
-        <Footer /> */}
-        <Example />
+        {/* <Footer /> */}
       </div>
       <ToastContainer pauseOnFocusLoss />
     </BrowserRouter>
