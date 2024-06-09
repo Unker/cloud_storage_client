@@ -31,7 +31,7 @@ export interface IFile {
 }
 
 export interface IStorageFiles {
-  id: number;
+  count: number;
   next: string;
   previous: string;
   results: IFile[];

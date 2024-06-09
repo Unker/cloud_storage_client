@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchCsrfToken } from './store/slices/authSlice';
 import { AppDispatch } from './store/store';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
 
