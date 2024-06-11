@@ -11,5 +11,5 @@ export const ROUTE_API_GET_CSRFTOKEN: string = `api/csrf/`;
 export const ROUTE_API_GET_TOKEN: string = 'api-token-auth/';
 
 export const ROUTE_API_USERS: string = `users/`;
-export const ROUTE_API_STORAGE: string = `storagefiles/`;
+export const ROUTE_API_STORAGE: string = `storagefiles`;
 

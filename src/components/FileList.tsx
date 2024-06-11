@@ -1,72 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { FaTrash, FaEdit, FaLink } from 'react-icons/fa';
-import { IFile, IStorageFiles } from '../utils/types';
-import { ROUTE_API_STORAGE } from '../utils/consts';
 import Paginator from './Paginator';
-import { toast } from 'react-toastify';
+import { useChangeFileCommentMutation, useDeleteFileMutation, useFetchFilesQuery } from '../api/fileApi';
+import { formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
 
 const FileList: React.FC = () => {
-  const [files, setFiles] = useState<IFile[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const limit = 2;
+  const limit = 5;
+  const offset = (currentPage - 1) * limit;
 
-  const fetchFiles = (page: number) => {
-    const offset = (page - 1) * limit;
-    const url = `${import.meta.env.VITE_SERVER_URL}/${ROUTE_API_STORAGE}?limit=${limit}&offset=${offset}`;
+  const { data, error, isLoading } = useFetchFilesQuery({ limit, offset });
+  const [deleteFile] = useDeleteFileMutation();
+  const [changeFileComment] = useChangeFileCommentMutation();
 
-    fetch(url, {
-      credentials: 'include',
-    })
-      .then((response) => response.json())
-      .then((data: IStorageFiles) => {
-        setFiles(data.results);
-        setTotalPages(Math.ceil(data.count / limit));
-      });
+  const handleDelete = async (fileId: number) => {
+    await deleteFile(fileId);
   };
 
-  useEffect(() => {
-    return fetchFiles(currentPage);
-  }, [currentPage]);
-
-  const handleDelete = (fileId: number) => {
-    console.log('delete: ', fileId)
+  const handleRename = async (fileId: number) => {
+    const newComment = prompt('Enter new comment:');
+    if (newComment) {
+      await changeFileComment({ fileId, newComment });
+    }
   };
-
-  const handleRename = (fileId: number) => {
-    console.log('rename: ', fileId)
-
-  };
-
-  const handleCopyLink = (shortLink: string) => {
-    navigator.clipboard.writeText(shortLink);
-    toast.success(`Link copied to clipboard! ${shortLink}`, { position: 'top-center' });
-  };
-
-  const truncateFileName = (name: string, limit: number) => {
-    if (name.length <= limit) return name;
-    const extension = name.slice(name.lastIndexOf('.'));
-    const nameWithoutExtension = name.slice(0, name.lastIndexOf('.'));
-    const charsToShow = Math.floor((limit - extension.length) / 2);
-    return `${nameWithoutExtension.slice(0, charsToShow)}...${nameWithoutExtension.slice(-charsToShow)}${extension}`;
-  };
-
-  function formatBytes(bytes: number, decimals = 2) {
-    if (!+bytes) return '0 Bytes'
-
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
-  }
 
   return (
     <div>
       <h2 className="text-2xl mb-4">My Files</h2>
+      {isLoading && <p>Loading...</p>}
+      {error && <p className="text-red-500">Error: {error.toString()}</p>}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -92,7 +55,7 @@ const FileList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {files.map((file) => (
+            {data && data.results.map((file) => (
               <tr key={file.id} className="hover:bg-gray-100">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <a href={file.file} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
@@ -115,11 +78,11 @@ const FileList: React.FC = () => {
           </tbody>
         </table>
       </div>
-      <Paginator
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {data && <Paginator
+         currentPage={currentPage}
+         totalPages={Math.ceil(data.count / limit)}
+         onPageChange={setCurrentPage}
+      />}
     </div>
   );
 };

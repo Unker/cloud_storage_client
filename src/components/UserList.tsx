@@ -21,11 +21,16 @@ const UserList: React.FC = () => {
     fetchUsers(ROUTE_API_USERS);
   }, []);
 
+  // const { data: users, error, isLoading } = useGetUsersQuery();
+
+  // if (isLoading) return <div>Loading...</div>;
+  // if (error) return <div>Error fetching users</div>;
+
   return (
     <div>
       <h2 className="text-2xl mb-4">User List</h2>
       <ul>
-        {users.map(user => (
+        {users?.map(user => (
           <li key={user.id}>{user.first_name} - {user.email}</li>
         ))}
       </ul>

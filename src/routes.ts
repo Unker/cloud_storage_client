@@ -11,7 +11,7 @@ export interface IPublicRoute {
   component: React.FC;
 }
 
-const publicRoutes: IPublicRoute[] = [
+export const publicRoutes: IPublicRoute[] = [
   {
     path: ROUTE_MAIN_PAGE,
     component: MainPage,
@@ -25,11 +25,9 @@ const publicRoutes: IPublicRoute[] = [
     path: ROUTE_REGISTER,
     component: Register,
   },
+];
 
-  {
-    path: ROUTE_ADMIN,
-    component: AdminPage,
-  },
+export const authRoutes: IPublicRoute[] = [
   {
     path: ROUTE_STORAGE,
     component: StoragePage,
@@ -41,4 +39,10 @@ const publicRoutes: IPublicRoute[] = [
 
 ];
 
-export default publicRoutes;
+export const adminRoutes: IPublicRoute[] = [
+  {
+    path: ROUTE_ADMIN,
+    component: AdminPage,
+  },
+
+];

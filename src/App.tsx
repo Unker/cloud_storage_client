@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { fetchCsrfToken } from './store/slices/authSlice';
 import { AppDispatch } from './store/store';
 import 'react-toastify/dist/ReactToastify.css';
+import Header from './components/Header';
 
 function App() {
 
@@ -19,7 +20,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="container mx-auto">
-        {/* <Header /> */}
+        <Header />
         <AppRouter />
         {/* <Footer /> */}
       </div>

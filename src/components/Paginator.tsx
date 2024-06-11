@@ -4,7 +4,6 @@ import React from 'react';
 interface PaginatorProps {
   currentPage: number;
   totalPages: number;
-  limit: number;
   onPageChange: (page: number) => void;
 }
 
