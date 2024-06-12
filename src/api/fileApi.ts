@@ -13,7 +13,6 @@ export const fileApi = createApi({
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState;
       const token = state.auth.token;
-      console.log('token', token)
       if (token) {
         headers.set('Authorization', `Token ${token}`);
       }

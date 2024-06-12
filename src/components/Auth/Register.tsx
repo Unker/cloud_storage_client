@@ -2,18 +2,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRegisterUserMutation } from '../../api/api';
+import { IRegisterErrors, IRegisterFormData } from '../../utils/types';
 
-interface ServerError {
-  message: string;
-  code: string;
-}
-
-interface Errors {
-  [key: string]: ServerError[];
-}
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IRegisterFormData>({
     username: '',
     first_name: '',
     last_name: '',
@@ -22,7 +15,7 @@ const Register: React.FC = () => {
     password2: '',
   });
 
-  const [errors, setErrors] = useState<Errors>({});
+  const [errors, setErrors] = useState<IRegisterErrors>({});
   const navigate = useNavigate();
   const [registerUser] = useRegisterUserMutation();
 
@@ -35,24 +28,32 @@ const Register: React.FC = () => {
 
   const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault();
+
     try {
       const data = await registerUser(formData).unwrap();
-      if (data.status === 'error' && data.errors) {
-        setErrors(JSON.parse(data.errors));
-      } else {
+      if (data.status === 'success') {
         navigate('/login');
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      if (err && typeof err === 'object' && 'data' in err) {
+        const errorData = (err as { data: { errors: string; status: string } }).data;
+        if (errorData.status === 'error' && errorData.errors) {
+          setErrors(JSON.parse(errorData.errors));
+        }
+      }
     }
   };
 
   const renderError = (field: string) => {
-    return errors[field]?.map((error, index) => (
-      <p key={index} className="text-red-500 text-sm">
-        {error.message}
-      </p>
-    ));
+    return (
+      <div className="h-5">
+        {errors[field]?.map((error, index) => (
+          <p key={index} className="text-red-500 text-sm">
+            {error.message}
+          </p>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -65,7 +66,7 @@ const Register: React.FC = () => {
       </div>
 
       <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={handleRegister}>
+        <form className="space-y-1" onSubmit={handleRegister}>
 
           <div>
             <label htmlFor="first_name" className="block text-left text-sm font-medium leading-6 text-gray-900">
@@ -77,7 +78,7 @@ const Register: React.FC = () => {
                 name="first_name"
                 type="text"
                 autoComplete="given-name"
-                required
+                // required
                 value={formData.first_name}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -96,7 +97,7 @@ const Register: React.FC = () => {
                 name="last_name"
                 type="text"
                 autoComplete="family-name"
-                required
+                // required
                 value={formData.last_name}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -115,7 +116,7 @@ const Register: React.FC = () => {
                 name="email"
                 type="email"
                 autoComplete="email"
-                required
+                // required
                 value={formData.email}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -134,7 +135,7 @@ const Register: React.FC = () => {
                 name="username"
                 type="text"
                 autoComplete="username"
-                required
+                // required
                 value={formData.username}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -153,7 +154,7 @@ const Register: React.FC = () => {
                 name="password1"
                 type="password"
                 autoComplete="new-password"
-                required
+                // required
                 value={formData.password1}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -172,7 +173,7 @@ const Register: React.FC = () => {
                 name="password2"
                 type="password"
                 autoComplete="new-password"
-                required
+                // required
                 value={formData.password2}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"

@@ -1,34 +1,28 @@
 // src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { IUser } from '../utils/types';
+import { IRegisterFormData, IRegistrationResponse, IUser } from '../utils/types';
 import { ROUTE_API_REGISTER, ROUTE_API_USERS } from '../utils/consts';
-
-interface RegistrationResponse {
-  status: string;
-  errors?: string;
-}
 
 export const apiRegistration = createApi({
   reducerPath: 'apiRegistration',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
-    // credentials: 'include'
+    credentials: 'include'
   }),
   endpoints: (builder) => ({
-    registerUser: builder.mutation<RegistrationResponse, {
-      username: string;
-      first_name: string;
-      last_name: string;
-      email: string;
-      password1: string;
-      password2: string;
-    }>({
-      query: (user) => ({
-        url: ROUTE_API_REGISTER,
-        method: 'POST',
-        body: user,
-      }),
+    registerUser: builder.mutation<IRegistrationResponse, IRegisterFormData>({
+      query: (formData) => {
+        const formDataToSend = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+          formDataToSend.append(key, value);
+        });
+        return {
+          url: ROUTE_API_REGISTER,
+          method: 'POST',
+          body: formDataToSend,
+        };
+      },
     }),
   }),
 });

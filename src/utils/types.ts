@@ -15,7 +15,29 @@ export interface IUsers {
   previous: string;
   results: IUser[];
 }
+export interface IRegisterFormData {
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  password1: string;
+  password2: string;
+}
 
+export interface IRegistrationResponse {
+  status: string;
+  errors?: string;
+  message?: string;
+}
+
+export interface IRegisterServerError {
+  message: string;
+  code: string;
+}
+
+export interface IRegisterErrors {
+  [key: string]: IRegisterServerError[];
+}
 
 export interface IFile {
   id: number;

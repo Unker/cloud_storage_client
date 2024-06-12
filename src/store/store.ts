@@ -7,14 +7,14 @@ import { fileApi } from '../api/fileApi';
 
 export const store = configureStore({
   reducer: {
-    [api.reducerPath]: api.reducer,
     [apiRegistration.reducerPath]: apiRegistration.reducer,
+    [api.reducerPath]: api.reducer,
     auth: authReducer,
     user: userReducer,
     [fileApi.reducerPath]: fileApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(fileApi.middleware),
+    getDefaultMiddleware().concat(fileApi.middleware, apiRegistration.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
