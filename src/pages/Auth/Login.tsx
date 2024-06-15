@@ -4,19 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../store/slices/authSlice';
 import { AppDispatch, RootState } from '../../store/store';
+import { ROUTE_ADMIN, ROUTE_STORAGE } from '../../utils/consts';
 
-const Login: React.FC = () => {
+const Login = (): JSX.Element => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { error } = useSelector((state: RootState) => state.auth);
+  const { error, isAdmin } = useSelector((state: RootState) => state.auth);
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
     dispatch(loginUser({ username, password })).then((action) => {
       if (loginUser.fulfilled.match(action)) {
-        navigate('/storage');
+        if (isAdmin) {
+          navigate(ROUTE_ADMIN);
+        } else {
+          navigate(ROUTE_STORAGE);
+        }
       }
     });
   };

@@ -19,7 +19,7 @@ function App() {
  
   return (
     <BrowserRouter>
-      <div className="container mx-auto">
+      <div>
         <Header />
         <AppRouter />
         {/* <Footer /> */}
@@ -29,4 +29,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

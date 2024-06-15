@@ -1,45 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { ROUTE_API_USERS } from '../utils/consts';
-import { IUser, IUsers } from '../utils/types';
+import React, { useState } from 'react';
+import { IUser } from '../utils/types';
+import Paginator from './Paginator';
+import { useGetUsersQuery } from '../api/api';
+import { selectUser } from '../store/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+
 
 const UserList: React.FC = () => {
-  const [users, setUsers] = useState<IUser[]>([]);
-  const [nextPage, setNextPage] = useState<string | null>(null);
-  const [prevPage, setPrevPage] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const selectedUserId = useSelector((state: RootState) => state.user.selectedUserId);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 15;
+  const offset = (currentPage - 1) * limit;
 
-  const fetchUsers = (url: string) => {
-    fetch(url)
-      .then(response => response.json())
-      .then((data: IUsers) => {
-        setUsers(data.results);
-        setNextPage(data.next);
-        setPrevPage(data.previous);
-      });
+  const { data, error, isLoading } = useGetUsersQuery({ limit, offset });
+
+  const handleSelectUser = (userId: number) => {
+    dispatch(selectUser(userId));
   };
 
-  useEffect(() => {
-    fetchUsers(ROUTE_API_USERS);
-  }, []);
-
-  // const { data: users, error, isLoading } = useGetUsersQuery();
-
-  // if (isLoading) return <div>Loading...</div>;
-  // if (error) return <div>Error fetching users</div>;
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading users</p>;
 
   return (
-    <div>
-      <h2 className="text-2xl mb-4">User List</h2>
+    <>
       <ul>
-        {users?.map(user => (
-          <li key={user.id}>{user.first_name} - {user.email}</li>
+        {data?.results.map((user: IUser) => (
+          <li key={user.id} className={`mb-2 ${user.id === selectedUserId ? 'bg-gray-300' : ''}`}>
+            <button
+              onClick={() => handleSelectUser(user.id)}
+              className={`text-left w-full p-2 rounded ${user.id === selectedUserId ? 'font-bold' : ''} hover:bg-gray-300`}
+            >
+              {user.username}
+            </button>
+          </li>
         ))}
       </ul>
-      <div className="mt-4">
-        {prevPage && <button onClick={() => fetchUsers(prevPage)} className="mr-2 bg-gray-300 px-4 py-2">Previous</button>}
-        {nextPage && <button onClick={() => fetchUsers(nextPage)} className="bg-gray-300 px-4 py-2">Next</button>}
-      </div>
-    </div>
-  );
-};
+      {data && <Paginator
+        currentPage={currentPage}
+        totalPages={Math.ceil(data.count / limit)}
+        onPageChange={setCurrentPage}
+      />}
+    </>
+  )
+}
 
 export default UserList;

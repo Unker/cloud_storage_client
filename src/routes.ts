@@ -2,8 +2,8 @@ import MainPage from './pages/MainPage.tsx';
 import AdminPage from './pages/AdminPage.tsx';
 import StoragePage from './pages/StoragePage.tsx';
 import FilePage from './pages/FilePage.tsx';
-import Register from './components/Auth/Register.tsx';
-import Login from './components/Auth/Login.tsx';
+import Register from './pages/Auth/Register.tsx';
+import Login from './pages/Auth/Login.tsx';
 import { ROUTE_ADMIN, ROUTE_LOGIN, ROUTE_MAIN_PAGE, ROUTE_REGISTER, ROUTE_STORAGE } from './utils/consts';
 
 export interface IPublicRoute {

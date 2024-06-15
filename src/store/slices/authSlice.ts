@@ -1,7 +1,7 @@
-// src/store/slices/authSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ROUTE_API_GET_TOKEN, ROUTE_API_LOGIN } from '../../utils/consts';
 import { getCSRFToken } from '../../utils/cookie';
+import { LoginResponse } from '../../utils/types';
 
 interface AuthState {
   token: string | null | undefined;
@@ -9,6 +9,9 @@ interface AuthState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   isAuth: boolean;
+  isAdmin: boolean;
+  userName: string | null | undefined;
+  user_id: number  | null | undefined;
 }
 
 const initialState: AuthState = {
@@ -17,6 +20,9 @@ const initialState: AuthState = {
   status: 'idle',
   error: null,
   isAuth: Boolean(localStorage.getItem('token')),
+  isAdmin: Boolean(localStorage.getItem('isAdmin')),
+  userName: undefined,
+  user_id: undefined,
 };
 
 const baseApiUrl = import.meta.env.VITE_SERVER_URL
@@ -54,9 +60,14 @@ export const loginUser = createAsyncThunk(
       throw new Error('Login failed');
     }
     
-    const data = await response.json();
+    const data: LoginResponse = await response.json();
+    const isAdmin = data.is_staff || data.is_superuser
 
-    return { token: data.token, csrfToken: getCSRFToken() };
+    return {
+      token: data.token,
+      csrfToken: getCSRFToken(),
+      isAdmin,
+    };
   }
 );
 
@@ -65,11 +76,10 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout(state) {
-      state.token = null;
-      state.csrfToken = null;
+    logout() {
       localStorage.removeItem('token');
-      state.isAuth = false;
+      localStorage.removeItem('isAdmin');
+      return initialState;
     },
   },
   extraReducers: (builder) => {
@@ -95,7 +105,9 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.csrfToken = action.payload.csrfToken;
         state.isAuth = true;
+        state.isAdmin = action.payload.isAdmin;
         localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('isAdmin', action.payload.isAdmin.toString());
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';

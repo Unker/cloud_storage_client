@@ -2,6 +2,7 @@
 export interface IUser {
   id: number,
   email: string,
+  username: string,
   first_name: string,
   last_name: string,
   is_active: number,
@@ -10,7 +11,7 @@ export interface IUser {
 }
 
 export interface IUsers {
-  id: number;
+  count: number;
   next: string;
   previous: string;
   results: IUser[];
@@ -57,4 +58,12 @@ export interface IStorageFiles {
   next: string;
   previous: string;
   results: IFile[];
+}
+
+export interface LoginResponse {
+  token: string,
+  user_id: number,
+  is_staff: boolean,
+  is_superuser: boolean,
+  username: string,
 }

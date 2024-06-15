@@ -1,8 +1,8 @@
 // src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { IRegisterFormData, IRegistrationResponse, IUser } from '../utils/types';
-import { ROUTE_API_REGISTER, ROUTE_API_USERS } from '../utils/consts';
+import { IRegisterFormData, IRegistrationResponse, IStorageFiles, IUsers } from '../utils/types';
+import { ROUTE_API_REGISTER, ROUTE_API_USERS, ROUTE_API_FILES_BY_USER } from '../utils/consts';
 
 export const apiRegistration = createApi({
   reducerPath: 'apiRegistration',
@@ -27,10 +27,11 @@ export const apiRegistration = createApi({
   }),
 });
 
-export const api = createApi({
+export const usersApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
+    credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
       const { token } = (getState() as RootState).auth;
 
@@ -40,29 +41,25 @@ export const api = createApi({
 
       return headers;
     },
-    credentials: 'include',
   }),
   endpoints: (builder) => ({
-    getUsers: builder.query<IUser[], void>({
-      query: () => ROUTE_API_USERS,
+    getUsers: builder.query<IUsers, { 
+      limit: number; 
+      offset: number;
+    }>({
+      query: ({ limit, offset }) => `${ROUTE_API_USERS}/?limit=${limit}&offset=${offset}`,
     }),
-    // login: builder.mutation<
-    // { 
-    //   token: string 
-    // }, 
-    // {
-    //   username: string;
-    //   password: string;
-    //   csrfmiddlewaretoken: string
-    // }>({
-    //   query: (credentials) => ({
-    //     url: ROUTE_API_LOGIN,
-    //     method: 'POST',
-    //     body: credentials,
-    //   }),
-    // }),
+    fetchUserFiles: builder.query<IStorageFiles, { 
+      limit: number; 
+      offset: number;
+      userId: number;
+    }>({
+      query: ({ limit, offset, userId }) => {
+        return `${ROUTE_API_FILES_BY_USER}/?limit=${limit}&offset=${offset}&user_id=${userId}`
+      }
+    }),
   }),
 });
 
 export const { useRegisterUserMutation } = apiRegistration;
-export const { useGetUsersQuery } = api;
+export const { useGetUsersQuery, useFetchUserFilesQuery } = usersApi;

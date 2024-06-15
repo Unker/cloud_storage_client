@@ -4,32 +4,71 @@ import { FaTrash, FaEdit, FaLink } from 'react-icons/fa';
 import Paginator from './Paginator';
 import { useChangeFileCommentMutation, useDeleteFileMutation, useFetchFilesQuery } from '../api/fileApi';
 import { formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
+import { useFetchUserFilesQuery } from '../api/api';
+import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 
-const FileList: React.FC = () => {
+interface FileListProps {
+  userId?: number;
+}
+
+const FileList: React.FC<FileListProps> = ({ userId }) => {
+  
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<number | undefined>(undefined);
+
   const limit = 5;
   const offset = (currentPage - 1) * limit;
+  
+  // Определяем, какой хук использовать в зависимости от наличия userId
+  const useFetchFiles = userId ? useFetchUserFilesQuery : useFetchFilesQuery;
 
-  const { data, error, isLoading } = useFetchFilesQuery({ limit, offset });
+  const { 
+    data: files = undefined,
+    error,
+    isLoading,
+    refetch: refetchUserFiles,
+  } = useFetchFiles({ limit, offset, userId: userId as number });
+
+
   const [deleteFile] = useDeleteFileMutation();
   const [changeFileComment] = useChangeFileCommentMutation();
 
-  const handleDelete = async (fileId: number) => {
-    await deleteFile(fileId);
+  const handleDelete = (fileId: number) => {
+    setShowDeleteModal(true);
+    setFileToDelete(fileId);
   };
+
+  const confirmDelete = async () => {
+    if (fileToDelete !== undefined) {
+      await deleteFile(fileToDelete);
+      refetchUserFiles();
+      setShowDeleteModal(false);
+      setFileToDelete(undefined);
+    }
+  };
+
+  const cancelDelete = async () => {
+    setShowDeleteModal(false);
+    setFileToDelete(undefined);
+  };
+
+  cancelDelete
 
   const handleRename = async (fileId: number) => {
     const newComment = prompt('Enter new comment:');
     if (newComment) {
       await changeFileComment({ fileId, newComment });
+      refetchUserFiles();
     }
   };
 
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading files</p>;
+
   return (
-    <div>
-      <h2 className="text-2xl mb-4">My Files</h2>
-      {isLoading && <p>Loading...</p>}
-      {error && <p className="text-red-500">Error: {error.toString()}</p>}
+    <div className='flex-1 p-4'>
+      <h2 className="text-2xl mb-4">Files</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -55,11 +94,11 @@ const FileList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {data && data.results.map((file) => (
+            {files && files.results.map((file) => (
               <tr key={file.id} className="hover:bg-gray-100">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <a href={file.file} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
-                    {truncateFileName(file.original_name, 50)}
+                    {truncateFileName(file.original_name, 20)}
                   </a>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.comment}</td>
@@ -78,11 +117,16 @@ const FileList: React.FC = () => {
           </tbody>
         </table>
       </div>
-      {data && <Paginator
+      {files && <Paginator
          currentPage={currentPage}
-         totalPages={Math.ceil(data.count / limit)}
+         totalPages={Math.ceil(files.count / limit)}
          onPageChange={setCurrentPage}
       />}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 };

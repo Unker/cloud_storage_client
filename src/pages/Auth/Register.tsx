@@ -5,7 +5,7 @@ import { useRegisterUserMutation } from '../../api/api';
 import { IRegisterErrors, IRegisterFormData } from '../../utils/types';
 
 
-const Register: React.FC = () => {
+const Register = (): JSX.Element => {
   const [formData, setFormData] = useState<IRegisterFormData>({
     username: '',
     first_name: '',
