@@ -1,34 +1,89 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { IUser } from '../utils/types';
-import { useGetUsersQuery } from '../api/api';
+import { useDeleteUserMutation, useGetUsersQuery, useUpdateUserMutation } from '../api/api';
 import { selectUser } from '../store/slices/userSlice';
 import { RootState } from '../store/store';
 import FileList from "../components/FileList";
 import Paginator from './Paginator';
-
+import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
+import { toast } from 'react-toastify';
 
 
 const UserList: React.FC = () => {
   const dispatch = useDispatch();
   const selectedUserId = useSelector((state: RootState) => state.user.selectedUserId);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 15;
   const offset = (currentPage - 1) * limit;
 
-  const { data, error, isLoading } = useGetUsersQuery({ limit, offset });
+  const {
+    data: users = undefined,
+    error,
+    isLoading,
+    refetch: refetchUsers,
+  } = useGetUsersQuery({ limit, offset });
 
-  const handleSelectUser = (userId: number) => {
+  const [updateUser] = useUpdateUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
+
+  const handleSelectUser = (userId: number | null) => {
+    if (selectedUserId === userId) {
+      userId = null;
+    }
     dispatch(selectUser(userId));
+  };
+
+  const handleToggleAdmin = async (user: IUser) => {
+    try {
+      const isAdmin = {
+        userId: user.id,
+        is_staff: !user.is_staff
+      };
+      await updateUser(isAdmin).unwrap();
+      toast.success(`User with ID ${user.id} updated successfully.`);
+      refetchUsers();
+    } catch (error) {
+      toast.error(`Failed to update user with ID ${user.id}:`, error);
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    setShowDeleteModal(true);
+    setUserToDelete(userId);
+
+  };
+
+  const confirmDelete = async () => {
+    if (userToDelete !== undefined) {
+      try {
+        await deleteUser(userToDelete).unwrap();
+        toast.success(`User with ID ${userToDelete} deleted successfully.`);
+        refetchUsers();
+      } catch (error) {
+        toast.error(`Failed to delete user with ID ${userToDelete}:`, error);
+      }
+      setShowDeleteModal(false);
+      setUserToDelete(undefined);
+    }
+  };
+
+  const cancelDelete = async () => {
+    setShowDeleteModal(false);
+    setUserToDelete(undefined);
   };
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading users</p>;
 
+  const sortedUsers = users?.results.slice().sort((a: IUser, b: IUser) => a.id - b.id);
+
   return (
     <>
-      <h2>Список пользователей</h2>
+      <h2 className='text-xl mb-2'>Список пользователей</h2>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -44,17 +99,23 @@ const UserList: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {data?.results.map((user: IUser) => (
-            <>
-              <tr key={user.id} className={`bg-white ${user.id === selectedUserId ? 'bg-gray-300' : ''}`}>
+          {sortedUsers?.map((user: IUser) => (
+            <React.Fragment key={user.id}>
+              <tr className={`hover:bg-gray-100 ${user.id === selectedUserId ? 'bg-gray-200' : ''}`}>
                 <td className="border border-gray-300 p-2">{user.id}</td>
                 <td className="border border-gray-300 p-2">{user.username}</td>
                 <td className="border border-gray-300 p-2">{user.email}</td>
                 <td className="border border-gray-300 p-2">{user.first_name}</td>
                 <td className="border border-gray-300 p-2">{user.last_name}</td>
-                <td className="border border-gray-300 p-2">{user.is_active ? 'Да' : 'Нет'}</td>
-                <td className="border border-gray-300 p-2">{user.is_staff ? 'Да' : 'Нет'}</td>
-                <td className="border border-gray-300 p-2">{user.is_superuser ? 'Да' : 'Нет'}</td>
+                <td className={`border border-gray-300 text-center text-xl ${user.is_active ? 'text-green-700' : 'text-red-400'}`}>
+                  {user.is_active ? <FaCheckCircle className="mx-auto" /> : <FaTimesCircle className="mx-auto" />}
+                </td>
+                <td className={`border border-gray-300 text-center text-xl ${user.is_staff ? 'text-green-700' : 'text-red-400'}`}>
+                  {user.is_staff ? <FaCheckCircle className="mx-auto" /> : <FaTimesCircle className="mx-auto" />}
+                </td>
+                <td className={`border border-gray-300 text-center text-xl ${user.is_superuser ? 'text-green-700' : 'text-red-400'}`}>
+                  {user.is_superuser ? <FaCheckCircle className="mx-auto" /> : <FaTimesCircle className="mx-auto" />}
+                </td>
                 <td className="border border-gray-300 p-2 space-x-2">
                   <button
                     onClick={() => handleSelectUser(user.id)}
@@ -82,14 +143,20 @@ const UserList: React.FC = () => {
                     <FileList userId={selectedUserId} />
                   </td>
                 </tr>
-              )}            </>
+              )}
+            </React.Fragment>
           ))}
         </tbody>
       </table>
-      <Paginator
+      {users && <Paginator
         currentPage={currentPage}
-        totalPages={Math.ceil(data.count / limit)}
+        totalPages={Math.ceil(users.count / limit)}
         onPageChange={setCurrentPage}
+      />}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
       />
 
     </>

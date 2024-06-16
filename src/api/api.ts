@@ -1,7 +1,7 @@
 // src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store/store';
-import { IRegisterFormData, IRegistrationResponse, IStorageFiles, IUsers } from '../utils/types';
+import { IRegisterFormData, IRegistrationResponse, IStorageFiles, IUserPost, IUsers } from '../utils/types';
 import { ROUTE_API_REGISTER, ROUTE_API_USERS, ROUTE_API_FILES_BY_USER } from '../utils/consts';
 
 export const apiRegistration = createApi({
@@ -58,8 +58,29 @@ export const usersApi = createApi({
         return `${ROUTE_API_FILES_BY_USER}/?limit=${limit}&offset=${offset}&user_id=${userId}`
       }
     }),
+    updateUser: builder.mutation<void, IUserPost>({
+      query: (args) => ({
+        url: `${ROUTE_API_USERS}/${args.userId}/`,
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: args,
+      }),
+    }),
+    deleteUser: builder.mutation<void, number>({
+      query: (userId) => ({
+        url: `${ROUTE_API_USERS}/${userId}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
 export const { useRegisterUserMutation } = apiRegistration;
-export const { useGetUsersQuery, useFetchUserFilesQuery } = usersApi;
+export const {
+  useGetUsersQuery,
+  useFetchUserFilesQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} = usersApi;

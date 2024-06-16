@@ -5,9 +5,9 @@ export interface IUser {
   username: string,
   first_name: string,
   last_name: string,
-  is_active: number,
-  is_staff: number,
-  is_superuser: number,
+  is_active: boolean,
+  is_staff: boolean,
+  is_superuser: boolean,
 }
 
 export interface IUsers {
@@ -16,6 +16,17 @@ export interface IUsers {
   previous: string;
   results: IUser[];
 }
+export interface IUserPost {
+  userId: number,
+  email?: string,
+  username?: string,
+  first_name?: string,
+  last_name?: string,
+  is_active?: boolean,
+  is_staff?: boolean,
+  is_superuser?: boolean,
+}
+
 export interface IRegisterFormData {
   username: string;
   first_name: string;

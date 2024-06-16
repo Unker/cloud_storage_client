@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { FaTrash, FaEdit, FaLink } from 'react-icons/fa';
 import Paginator from './Paginator';
@@ -6,24 +6,27 @@ import { useChangeFileCommentMutation, useDeleteFileMutation, useFetchFilesQuery
 import { formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
 import { useFetchUserFilesQuery } from '../api/api';
 import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 interface FileListProps {
   userId?: number;
 }
 
 const FileList: React.FC<FileListProps> = ({ userId }) => {
-  
+  const { username } = useSelector((state: RootState) => state.auth);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<number | undefined>(undefined);
 
   const limit = 5;
   const offset = (currentPage - 1) * limit;
-  
+
   // Определяем, какой хук использовать в зависимости от наличия userId
   const useFetchFiles = userId ? useFetchUserFilesQuery : useFetchFilesQuery;
 
-  const { 
+  const {
     data: files = undefined,
     error,
     isLoading,
@@ -33,6 +36,20 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
 
   const [deleteFile] = useDeleteFileMutation();
   const [changeFileComment] = useChangeFileCommentMutation();
+
+  useEffect(() => {
+    let intervalId = undefined;
+
+    if (error) {
+      intervalId = setInterval(() => {
+        refetchUserFiles();
+      }, 5000);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [error, refetchUserFiles]);
 
   const handleDelete = (fileId: number) => {
     setShowDeleteModal(true);
@@ -60,13 +77,18 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
       refetchUserFiles();
     }
   };
-  
+
   if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading files</p>;
+  if (error) return (
+    <>
+      <p>Error loading files</p>
+      { console.log( error) }
+    </>
+  );
 
   return (
     <div className='flex-1'>
-      <h2 className="text-2xl mb-4">Files id:{userId}</h2>
+      <h2 className="text-2xl mb-4">Files {userId ? `id:${userId}` : username}</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -116,9 +138,9 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
         </table>
       </div>
       {files && <Paginator
-         currentPage={currentPage}
-         totalPages={Math.ceil(files.count / limit)}
-         onPageChange={setCurrentPage}
+        currentPage={currentPage}
+        totalPages={Math.ceil(files.count / limit)}
+        onPageChange={setCurrentPage}
       />}
       <DeleteConfirmationModal
         isOpen={showDeleteModal}

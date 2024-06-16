@@ -10,7 +10,7 @@ interface AuthState {
   error: string | null;
   isAuth: boolean;
   isAdmin: boolean;
-  userName: string | null | undefined;
+  username: string | null | undefined;
   user_id: number  | null | undefined;
 }
 
@@ -21,7 +21,7 @@ const initialState: AuthState = {
   error: null,
   isAuth: Boolean(localStorage.getItem('token')),
   isAdmin: Boolean(localStorage.getItem('isAdmin')),
-  userName: undefined,
+  username: localStorage.getItem('username'),
   user_id: undefined,
 };
 
@@ -67,6 +67,7 @@ export const loginUser = createAsyncThunk(
       token: data.token,
       csrfToken: getCSRFToken(),
       isAdmin,
+      username,
     };
   }
 );
@@ -79,6 +80,7 @@ const authSlice = createSlice({
     logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('isAdmin');
+      localStorage.removeItem('username');
       return initialState;
     },
   },
@@ -108,6 +110,7 @@ const authSlice = createSlice({
         state.isAdmin = action.payload.isAdmin;
         localStorage.setItem('token', action.payload.token);
         localStorage.setItem('isAdmin', action.payload.isAdmin.toString());
+        localStorage.setItem('username', action.payload.username);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
