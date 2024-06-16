@@ -53,8 +53,6 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
     setFileToDelete(undefined);
   };
 
-  cancelDelete
-
   const handleRename = async (fileId: number) => {
     const newComment = prompt('Enter new comment:');
     if (newComment) {
@@ -62,13 +60,13 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
       refetchUserFiles();
     }
   };
-
+  
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading files</p>;
 
   return (
-    <div className='flex-1 p-4'>
-      <h2 className="text-2xl mb-4">Files</h2>
+    <div className='flex-1'>
+      <h2 className="text-2xl mb-4">Files id:{userId}</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">

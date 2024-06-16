@@ -11,7 +11,7 @@ const AppRouter = (): JSX.Element => {
   const { isAuth, isAdmin } = useSelector((state: RootState) => state.auth);
 
   return (
-    <main className='container'>
+    <main className='container mt-4'>
       <Routes>
         {isAuth && authRoutes.map(({ path, component: Component }: IPublicRoute) =>
           <Route key={path} path={path} element={<Component />} />

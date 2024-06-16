@@ -16,7 +16,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-gray-800 p-4 fixed inset-x-0 top-0 h-16 overflow-auto z-50">
+    <header className="bg-gray-800 p-4 inset-x-0 w-full h-18 z-50">
     {/* <header className="fixed flex p-4 items-center justify-between bg-gray-800 py-2 shadow-dark-mild dark:bg-body-dark lg:flex-wrap lg:justify-start lg:py-4"> */}
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-white text-2xl pr-10">Cloud Storage</h1>
