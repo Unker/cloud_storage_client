@@ -47,7 +47,7 @@ const UserList: React.FC = () => {
       toast.success(`User with ID ${user.id} updated successfully.`);
       refetchUsers();
     } catch (error) {
-      toast.error(`Failed to update user with ID ${user.id}:`, error);
+      toast.error(`Failed to update user with ID ${user.id}: ${error}`);
     }
   };
 
@@ -64,7 +64,7 @@ const UserList: React.FC = () => {
         toast.success(`User with ID ${userToDelete} deleted successfully.`);
         refetchUsers();
       } catch (error) {
-        toast.error(`Failed to delete user with ID ${userToDelete}:`, error);
+        toast.error(`Failed to delete user with ID ${userToDelete}: ${error}`);
       }
       setShowDeleteModal(false);
       setUserToDelete(undefined);
@@ -119,13 +119,13 @@ const UserList: React.FC = () => {
                 <td className="border border-gray-300 p-2 space-x-2">
                   <button
                     onClick={() => handleSelectUser(user.id)}
-                    className={`px-2 py-1 text-sm rounded ${user.id === selectedUserId ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                    className={`px-2 py-1 my-1 text-sm rounded ${user.id === selectedUserId ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
                   >
                     Файлы
                   </button>
                   <button
                     onClick={() => handleToggleAdmin(user)}
-                    className={`px-2 py-1 text-sm rounded ${user.is_staff ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                    className={`px-2 py-1 my-1 text-sm rounded ${user.is_staff ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
                   >
                     {user.is_staff ? 'Убрать админа' : 'Сделать админом'}
                   </button>

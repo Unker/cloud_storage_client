@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { FaTrash, FaEdit, FaLink } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaLink, FaCloudDownloadAlt } from 'react-icons/fa';
 import Paginator from './Paginator';
-import { useChangeFileCommentMutation, useDeleteFileMutation, useFetchFilesQuery } from '../api/fileApi';
+import { useChangeFileCommentMutation, useDeleteFileMutation, useDeleteShortLinkMutation, useFetchFilesQuery, useGenerateShortLinkMutation } from '../api/fileApi';
 import { formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
 import { useFetchUserFilesQuery } from '../api/api';
 import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { IFile } from '../utils/types';
 
 interface FileListProps {
   userId?: number;
@@ -36,6 +37,8 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
 
   const [deleteFile] = useDeleteFileMutation();
   const [changeFileComment] = useChangeFileCommentMutation();
+  const [generateShortLink] = useGenerateShortLinkMutation();
+  const [deleteShortLink] = useDeleteShortLinkMutation();
 
   useEffect(() => {
     let intervalId = undefined;
@@ -78,11 +81,20 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
     }
   };
 
+  const handleToggleLink = async (file: IFile) => {
+    if (!file.short_link) {
+      await generateShortLink({ fileId: file.id });
+    } else {
+      await deleteShortLink({ fileId: file.id });
+    }
+    refetchUserFiles();
+  };
+
   if (isLoading) return <p>Loading...</p>;
   if (error) return (
     <>
       <p>Error loading files</p>
-      { console.log( error) }
+      {console.log(error)}
     </>
   );
 
@@ -128,10 +140,22 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button onClick={() => handleDelete(file.id)} className="text-red-600 hover:text-red-900 mr-2"><FaTrash /></button>
                   <button onClick={() => handleRename(file.id)} className="text-yellow-600 hover:text-yellow-900 mr-2"><FaEdit /></button>
+                  <button onClick={() => handleDownload(file.id)} className="text-blue-600 hover:text-blue-900 mr-2"><FaCloudDownloadAlt /></button>
+
                   {file.short_link &&
                     <button onClick={() => handleCopyLink(file.short_link)} className="text-green-600 hover:text-green-900"><FaLink /></button>
                   }
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <button
+                    onClick={() => handleToggleLink(file)}
+                    className={`px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                  >
+                    {file.short_link ? 'Удалить ссылку' : 'Создать ссылку'}
+                  </button>
+
+                </td>
+
               </tr>
             ))}
           </tbody>

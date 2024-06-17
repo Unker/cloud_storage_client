@@ -1,8 +1,11 @@
 import { toast } from "react-toastify";
+import { ROUTE_API_DOWNLOAD } from "./consts";
 
 export const handleCopyLink = (shortLink: string) => {
-  navigator.clipboard.writeText(shortLink);
-  toast.success(`Link copied to clipboard! ${shortLink}`, { position: 'top-center' });
+  const baseUrl = import.meta.env.VITE_SERVER_URL;
+  const fullLink = `${baseUrl}/${ROUTE_API_DOWNLOAD}/${shortLink}`
+  navigator.clipboard.writeText(fullLink);
+  toast.success(`Link copied to clipboard! ${fullLink}`, { position: 'top-center' });
 };
 
 export const truncateFileName = (name: string, limit: number) => {

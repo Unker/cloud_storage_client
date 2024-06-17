@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IStorageFiles } from '../utils/types';
-import { ROUTE_API_STORAGE } from '../utils/consts';
+import { ROUTE_API_DELETE_LINK, ROUTE_API_GENERATE_LINK, ROUTE_API_STORAGE } from '../utils/consts';
 import { RootState } from '../store/store';
 
 const baseApiUrl = import.meta.env.VITE_SERVER_URL;
@@ -39,6 +39,24 @@ export const fileApi = createApi({
         body: { comment: newComment },
       }),
     }),
+    generateShortLink: builder.mutation<void, { fileId: number; }>({
+      query: ({ fileId }) => ({
+        url: `${ROUTE_API_STORAGE}/${fileId}/${ROUTE_API_GENERATE_LINK}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
+    deleteShortLink: builder.mutation<void, { fileId: number; }>({
+      query: ({ fileId }) => ({
+        url: `${ROUTE_API_STORAGE}/${fileId}/${ROUTE_API_DELETE_LINK}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
 
   }),
 });
@@ -47,4 +65,6 @@ export const {
   useFetchFilesQuery, 
   useDeleteFileMutation,
   useChangeFileCommentMutation,
+  useGenerateShortLinkMutation,
+  useDeleteShortLinkMutation,
 } = fileApi;
