@@ -13,7 +13,16 @@ export const ROUTE_API_GET_TOKEN: string = 'api-token-auth/';
 export const ROUTE_API_USERS: string = `users`;
 export const ROUTE_API_STORAGE: string = `storagefiles`;
 export const ROUTE_API_FILES_BY_USER: string = `storagefiles/by_user`;
-export const ROUTE_API_DOWNLOAD: string = `storagefiles/download`;
-export const ROUTE_API_GENERATE_LINK: string = `generate_short_link/`;
-export const ROUTE_API_DELETE_LINK: string = `delete_short_link/`;
 
+export const getRouteApiDownloadByShortLink = (shortLink: string | number): string => {
+  return `storagefiles/download/${shortLink}/`; 
+}
+export const getRouteApiDownloadById = (fileId: string | number): string => {
+  return `storagefiles/${fileId}/download/`; 
+}
+export const getRouteApiGenerateShortLink = (fileId: string | number): string => {
+  return `storagefiles/${fileId}/generate_short_link/`;
+}
+export const getRouteApiDeleteShortLink = (fileId: string | number): string => {
+  return `storagefiles/${fileId}/delete_short_link/`;
+}

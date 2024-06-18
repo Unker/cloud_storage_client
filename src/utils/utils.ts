@@ -1,9 +1,10 @@
+import axios from 'axios';
 import { toast } from "react-toastify";
-import { ROUTE_API_DOWNLOAD } from "./consts";
+import { getRouteApiDownloadById, getRouteApiDownloadByShortLink } from "./consts";
 
 export const handleCopyLink = (shortLink: string) => {
   const baseUrl = import.meta.env.VITE_SERVER_URL;
-  const fullLink = `${baseUrl}/${ROUTE_API_DOWNLOAD}/${shortLink}`
+  const fullLink = `${baseUrl}/${getRouteApiDownloadByShortLink(shortLink)}`
   navigator.clipboard.writeText(fullLink);
   toast.success(`Link copied to clipboard! ${fullLink}`, { position: 'top-center' });
 };
@@ -26,4 +27,54 @@ export const formatBytes = (bytes: number, decimals = 2) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
+const getToken = () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    return `Token ${token}`;
+  }
+  return null;
+};
+
+export async function downloadFileById(fileId: string | number) {
+  const baseUrl = import.meta.env.VITE_SERVER_URL;
+  const url = `${baseUrl}/${getRouteApiDownloadById(fileId)}`;
+
+  try {
+    const response = await axios({
+      url: url,
+      method: 'GET',
+      headers: {
+        'Authorization': `${getToken()}`
+      },
+      responseType: 'blob',
+    });
+
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = 'file';
+    console.log('response',response.headers)
+    console.log('contentDisposition',contentDisposition)
+    if (contentDisposition) {
+      const fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      const matches = fileNameRegex.exec(contentDisposition);
+      if (matches && matches[1]) {
+        filename = matches[1].replace(/['"]/g, '');
+      }
+    }
+
+    const blob = new Blob([response.data], { type: 'application/octet-stream' });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(downloadUrl);
+    document.body.removeChild(a);
+
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
 }

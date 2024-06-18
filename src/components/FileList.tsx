@@ -2,8 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { FaTrash, FaEdit, FaLink, FaCloudDownloadAlt } from 'react-icons/fa';
 import Paginator from './Paginator';
-import { useChangeFileCommentMutation, useDeleteFileMutation, useDeleteShortLinkMutation, useFetchFilesQuery, useGenerateShortLinkMutation } from '../api/fileApi';
-import { formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
+import {
+  useChangeFileCommentMutation,
+  useDeleteFileMutation,
+  useDeleteShortLinkMutation,
+  useFetchFilesQuery,
+  useGenerateShortLinkMutation
+} from '../api/fileApi';
+import { downloadFileById, formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
 import { useFetchUserFilesQuery } from '../api/api';
 import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 import { useSelector } from 'react-redux';
@@ -39,6 +45,7 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
   const [changeFileComment] = useChangeFileCommentMutation();
   const [generateShortLink] = useGenerateShortLinkMutation();
   const [deleteShortLink] = useDeleteShortLinkMutation();
+  
 
   useEffect(() => {
     let intervalId = undefined;
@@ -78,6 +85,16 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
     if (newComment) {
       await changeFileComment({ fileId, newComment });
       refetchUserFiles();
+    }
+  };
+
+  const handleDownload = async (fileId: number) => {
+    try {
+      const response = await downloadFileById(fileId);
+      console.log('response',response)
+
+    } catch (err) {
+      console.log(err)
     }
   };
 
