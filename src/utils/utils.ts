@@ -53,13 +53,10 @@ export async function downloadFileById(fileId: string | number) {
 
     const contentDisposition = response.headers['content-disposition'];
     let filename = 'file';
-    console.log('response',response.headers)
-    console.log('contentDisposition',contentDisposition)
     if (contentDisposition) {
-      const fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-      const matches = fileNameRegex.exec(contentDisposition);
-      if (matches && matches[1]) {
-        filename = matches[1].replace(/['"]/g, '');
+      const matches = contentDisposition.match(/filename="([^"]+)"/);
+      if (matches && matches.length > 1) {
+          filename = matches[1];
       }
     }
 
@@ -75,6 +72,7 @@ export async function downloadFileById(fileId: string | number) {
     document.body.removeChild(a);
 
   } catch (error) {
-    console.error('Error downloading file:', error);
+    console.log(error)
+    throw new Error('Error downloading file: ' + error);
   }
 }

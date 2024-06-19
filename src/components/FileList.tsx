@@ -15,6 +15,7 @@ import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { IFile } from '../utils/types';
+import { toast } from 'react-toastify';
 
 interface FileListProps {
   userId?: number;
@@ -90,11 +91,10 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
 
   const handleDownload = async (fileId: number) => {
     try {
-      const response = await downloadFileById(fileId);
-      console.log('response',response)
+      await downloadFileById(fileId);
 
     } catch (err) {
-      console.log(err)
+      toast.error(`${err}`)
     }
   };
 
@@ -145,16 +145,16 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
           <tbody className="bg-white divide-y divide-gray-200">
             {files && files.results.map((file) => (
               <tr key={file.id} className="hover:bg-gray-100">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <a href={file.file} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
                     {truncateFileName(file.original_name, 20)}
                   </a>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.comment}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatBytes(file.size)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{format(new Date(file.upload_date), 'PPP')}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{file.last_download_date ? format(new Date(file.last_download_date), 'PPP') : 'Never'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className="px-2 py-4 text-sm text-gray-500 max-w-64 break-words">{file.comment}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{formatBytes(file.size)}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{format(new Date(file.upload_date), 'PPP')}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{file.last_download_date ? format(new Date(file.last_download_date), 'PPP') : 'Never'}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-sm font-medium">
                   <button onClick={() => handleDelete(file.id)} className="text-red-600 hover:text-red-900 mr-2"><FaTrash /></button>
                   <button onClick={() => handleRename(file.id)} className="text-yellow-600 hover:text-yellow-900 mr-2"><FaEdit /></button>
                   <button onClick={() => handleDownload(file.id)} className="text-blue-600 hover:text-blue-900 mr-2"><FaCloudDownloadAlt /></button>
@@ -163,7 +163,7 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
                     <button onClick={() => handleCopyLink(file.short_link)} className="text-green-600 hover:text-green-900"><FaLink /></button>
                   }
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
                   <button
                     onClick={() => handleToggleLink(file)}
                     className={`px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}

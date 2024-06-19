@@ -88,14 +88,14 @@ const UserList: React.FC = () => {
         <thead>
           <tr className="bg-gray-100">
             <th className="border border-gray-300 p-2">ID</th>
-            <th className="border border-gray-300 p-2">Имя пользователя</th>
+            <th className="border border-gray-300 p-2">Username</th>
             <th className="border border-gray-300 p-2">Email</th>
-            <th className="border border-gray-300 p-2">Имя</th>
-            <th className="border border-gray-300 p-2">Фамилия</th>
-            <th className="border border-gray-300 p-2">Активен</th>
-            <th className="border border-gray-300 p-2">Администратор</th>
-            <th className="border border-gray-300 p-2">Суперпользователь</th>
-            <th className="border border-gray-300 p-2">Действия</th>
+            <th className="border border-gray-300 p-2">First name</th>
+            <th className="border border-gray-300 p-2">Last name</th>
+            <th className="border border-gray-300 p-2">Active</th>
+            <th className="border border-gray-300 p-2">Admin</th>
+            <th className="border border-gray-300 p-2">Superuser</th>
+            <th className="border border-gray-300 p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
