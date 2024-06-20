@@ -39,6 +39,19 @@ export const fileApi = createApi({
         body: { comment: newComment },
       }),
     }),
+    uploadFile: builder.mutation<void, { file: File; comment: string }>({
+      query: ({ file, comment }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('comment', comment);
+
+        return {
+          url: `${ROUTE_API_STORAGE}/`,
+          method: 'POST',
+          body: formData,
+        }
+      },
+    }),
     generateShortLink: builder.mutation<void, { fileId: number; }>({
       query: ({ fileId }) => ({
         url: getRouteApiGenerateShortLink(fileId),
@@ -61,9 +74,10 @@ export const fileApi = createApi({
 });
 
 export const {
-  useFetchFilesQuery, 
+  useFetchFilesQuery,
   useDeleteFileMutation,
   useChangeFileCommentMutation,
+  useUploadFileMutation,
   useGenerateShortLinkMutation,
   useDeleteShortLinkMutation,
 } = fileApi;

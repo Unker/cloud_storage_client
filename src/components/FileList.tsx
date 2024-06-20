@@ -7,7 +7,7 @@ import {
   useDeleteFileMutation,
   useDeleteShortLinkMutation,
   useFetchFilesQuery,
-  useGenerateShortLinkMutation
+  useGenerateShortLinkMutation,
 } from '../api/fileApi';
 import { downloadFileById, formatBytes, handleCopyLink, truncateFileName } from '../utils/utils';
 import { useFetchUserFilesQuery } from '../api/api';
@@ -19,9 +19,10 @@ import { toast } from 'react-toastify';
 
 interface FileListProps {
   userId?: number;
+  setRefetchUserFiles: (refetchFunc: () => void) => void;
 }
 
-const FileList: React.FC<FileListProps> = ({ userId }) => {
+const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
   const { username } = useSelector((state: RootState) => state.auth);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,21 +47,23 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
   const [changeFileComment] = useChangeFileCommentMutation();
   const [generateShortLink] = useGenerateShortLinkMutation();
   const [deleteShortLink] = useDeleteShortLinkMutation();
-  
 
   useEffect(() => {
     let intervalId = undefined;
 
-    if (error) {
-      intervalId = setInterval(() => {
-        refetchUserFiles();
-      }, 5000);
-    }
+    intervalId = setInterval(() => {
+      refetchUserFiles();
+    }, 15000);
+
 
     return () => {
       clearInterval(intervalId);
     };
   }, [error, refetchUserFiles]);
+
+  useEffect(() => {
+    setRefetchUserFiles(refetchUserFiles);
+  }, [refetchUserFiles, setRefetchUserFiles]);
 
   const handleDelete = (fileId: number) => {
     setShowDeleteModal(true);
@@ -122,22 +125,22 @@ const FileList: React.FC<FileListProps> = ({ userId }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 File Name
               </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Comment
               </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Size
               </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Uploaded
               </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Last Downloaded
               </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Operations
               </th>
             </tr>

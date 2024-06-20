@@ -14,7 +14,7 @@ export const truncateFileName = (name: string, limit: number) => {
   const extension = name.slice(name.lastIndexOf('.'));
   const nameWithoutExtension = name.slice(0, name.lastIndexOf('.'));
   const charsToShow = Math.floor((limit - extension.length) / 2);
-  return `${nameWithoutExtension.slice(0, charsToShow)}...${nameWithoutExtension.slice(-charsToShow)}${extension}`;
+  return `${nameWithoutExtension.slice(0, charsToShow+10)}...${nameWithoutExtension.slice(-charsToShow)}${extension}`;
 };
 
 export const formatBytes = (bytes: number, decimals = 2) => {

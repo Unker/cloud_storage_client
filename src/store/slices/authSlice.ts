@@ -108,6 +108,7 @@ const authSlice = createSlice({
         state.csrfToken = action.payload.csrfToken;
         state.isAuth = true;
         state.isAdmin = action.payload.isAdmin;
+        state.username = action.payload.username;
         localStorage.setItem('token', action.payload.token);
         localStorage.setItem('isAdmin', action.payload.isAdmin.toString());
         localStorage.setItem('username', action.payload.username);
