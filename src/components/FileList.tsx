@@ -19,7 +19,7 @@ import { toast } from 'react-toastify';
 
 interface FileListProps {
   userId?: number;
-  setRefetchUserFiles: (refetchFunc: () => void) => void;
+  setRefetchUserFiles?: (refetchFunc: () => void) => void;
 }
 
 const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
@@ -62,7 +62,9 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
   }, [error, refetchUserFiles]);
 
   useEffect(() => {
-    setRefetchUserFiles(refetchUserFiles);
+    if (setRefetchUserFiles) {
+      setRefetchUserFiles(refetchUserFiles);
+    }
   }, [refetchUserFiles, setRefetchUserFiles]);
 
   const handleDelete = (fileId: number) => {
@@ -122,70 +124,76 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
     <div className='flex-1'>
       <h2 className="text-2xl mb-4">Files {userId ? `id:${userId}` : username}</h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                File Name
-              </th>
-              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Comment
-              </th>
-              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Size
-              </th>
-              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Uploaded
-              </th>
-              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Downloaded
-              </th>
-              <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Operations
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {files && files.results.map((file) => (
-              <tr key={file.id} className="hover:bg-gray-100">
-                <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  <a href={file.file} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
-                    {truncateFileName(file.original_name, 20)}
-                  </a>
-                </td>
-                <td className="px-2 py-4 text-sm text-gray-500 max-w-64 break-words">{file.comment}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{formatBytes(file.size)}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{format(new Date(file.upload_date), 'PPP')}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{file.last_download_date ? format(new Date(file.last_download_date), 'PPP') : 'Never'}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-sm font-medium">
-                  <button onClick={() => handleDelete(file.id)} className="text-red-600 hover:text-red-900 mr-2"><FaTrash /></button>
-                  <button onClick={() => handleRename(file.id)} className="text-yellow-600 hover:text-yellow-900 mr-2"><FaEdit /></button>
-                  <button onClick={() => handleDownload(file.id)} className="text-blue-600 hover:text-blue-900 mr-2"><FaCloudDownloadAlt /></button>
-
-                  {file.short_link &&
-                    <button onClick={() => handleCopyLink(file.short_link)} className="text-green-600 hover:text-green-900"><FaLink /></button>
-                  }
-                </td>
-                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button
-                    onClick={() => handleToggleLink(file)}
-                    className={`px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
-                  >
-                    {file.short_link ? 'Удалить ссылку' : 'Создать ссылку'}
-                  </button>
-
-                </td>
-
+        {files && files.results.length > 0 ? (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  File Name
+                </th>
+                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Comment
+                </th>
+                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Size
+                </th>
+                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Uploaded
+                </th>
+                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Last Downloaded
+                </th>
+                <th scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Operations
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {files.results.map((file) => (
+                <tr key={file.id} className="hover:bg-gray-100">
+                  <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <a href={file.file} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
+                      {truncateFileName(file.original_name, 20)}
+                    </a>
+                  </td>
+                  <td className="px-2 py-4 text-sm text-gray-500 max-w-64 break-words">{file.comment}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{formatBytes(file.size)}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{format(new Date(file.upload_date), 'PPP')}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{file.last_download_date ? format(new Date(file.last_download_date), 'PPP') : 'Never'}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onClick={() => handleDelete(file.id)} className="text-red-600 hover:text-red-900 mr-2"><FaTrash /></button>
+                    <button onClick={() => handleRename(file.id)} className="text-yellow-600 hover:text-yellow-900 mr-2"><FaEdit /></button>
+                    <button onClick={() => handleDownload(file.id)} className="text-blue-600 hover:text-blue-900 mr-2"><FaCloudDownloadAlt /></button>
+
+                    {file.short_link &&
+                      <button onClick={() => handleCopyLink(file.short_link)} className="text-green-600 hover:text-green-900"><FaLink /></button>
+                    }
+                  </td>
+                  <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      onClick={() => handleToggleLink(file)}
+                      className={`px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                    >
+                      {file.short_link ? 'Удалить ссылку' : 'Создать ссылку'}
+                    </button>
+
+                  </td>
+
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center text-gray-900 mb-3">no files yet</div>
+        )}
       </div>
-      {files && <Paginator
-        currentPage={currentPage}
-        totalPages={Math.ceil(files.count / limit)}
-        onPageChange={setCurrentPage}
-      />}
+      {files && files.results.length > 0 && (
+        <Paginator
+          currentPage={currentPage}
+          totalPages={Math.ceil(files.count / limit)}
+          onPageChange={setCurrentPage}
+        />
+      )}
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onConfirm={confirmDelete}
