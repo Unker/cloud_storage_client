@@ -46,7 +46,7 @@ const Register = (): JSX.Element => {
 
   const renderError = (field: string) => {
     return (
-      <div className="h-5">
+      <div className="h-auto min-h-5">
         {errors[field]?.map((error, index) => (
           <p key={index} className="text-red-500 text-sm">
             {error.message}
