@@ -77,11 +77,18 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout() {
+    logout(state) {
       localStorage.removeItem('token');
       localStorage.removeItem('isAdmin');
       localStorage.removeItem('username');
-      return initialState;
+      state.token =null;
+      state.csrfToken = null;
+      state.status = 'idle';
+      state.error = null;
+      state.isAuth = false;
+      state.isAdmin = false;
+      state.username = null;
+      state.user_id = null;
     },
   },
   extraReducers: (builder) => {
