@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useUploadFileMutation } from '../api/fileApi';
 import { toast } from 'react-toastify';
+import { FileUploader } from 'react-drag-drop-files';
 
 interface FileUploadComponentProps {
   onUploadSuccess: () => void;
@@ -21,10 +22,8 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({ onUploadSucce
     }
   }, [isSuccess, isError]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setFile(event.target.files[0]);
-    }
+  const handleDrop = (file: File) => {
+    setFile(file);
   };
 
   const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,22 +43,17 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({ onUploadSucce
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-xl my-4">
+    <div className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-xl my-4">
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Upload File</label>
-        <input
-          type="file"
-          onChange={handleFileChange}
-          ref={fileInputRef}
-          className="
-            block w-full text-sm text-slate-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-lg file:border-0
-            file:text-sm file:font-semibold
-            file:bg-indigo-600 file:text-white
-            hover:file:bg-indigo-700
-          "
+        <FileUploader
+          classes="w-full h-32 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4"
+          required
+          handleChange={handleDrop}
+          name="file"
+          types={["JPG", "JPEG", "PNG", "GIF", "PDF"]}
         />
+        {file && <p className="mt-2 text-sm text-gray-500">{file.name}</p>}
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Comment</label>
