@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  client:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: ["serve", "-s", "dist", "-l", "3000"]
