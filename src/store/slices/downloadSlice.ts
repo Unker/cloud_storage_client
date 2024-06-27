@@ -46,7 +46,11 @@ export const downloadFileById = createAsyncThunk(
 
       return fileBlob;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data || 'Failed to download file');
+      if (axios.isAxiosError(error)) {
+        return thunkAPI.rejectWithValue(error.response?.data || 'Failed to download file');
+      } else {
+        return thunkAPI.rejectWithValue('Failed to download file');
+      }
     }
   }
 );
