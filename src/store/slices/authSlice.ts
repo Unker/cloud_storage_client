@@ -20,7 +20,7 @@ const initialState: AuthState = {
   status: 'idle',
   error: null,
   isAuth: Boolean(localStorage.getItem('token')),
-  isAdmin: Boolean(localStorage.getItem('isAdmin')),
+  isAdmin: localStorage.getItem('isAdmin') === 'true',
   username: localStorage.getItem('username'),
   user_id: undefined,
 };
