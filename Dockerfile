@@ -6,6 +6,9 @@ WORKDIR /app
 # Копируем файлы проекта
 COPY . /app
 
+RUN apt-get update \
+    && apt-get install xsel
+
 # Устанавливаем зависимости и собираем проект
 RUN npm install
 RUN npm run build
