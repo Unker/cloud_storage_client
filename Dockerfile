@@ -1,7 +1,7 @@
 FROM node:20.5.0
 
-# отключить Husky
-ENV CI=true
+# Отключаем Husky
+ENV HUSKY=0
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
