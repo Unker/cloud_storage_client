@@ -21,7 +21,7 @@ const Header: React.FC = () => {
         <h1 className="text-white text-2xl pr-10 pointer">
           <NavLink to={ROUTE_MAIN_PAGE}>Cloud Storage</NavLink>
         </h1>
-        <div className="absolute absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute flex top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           {username && <div className={`text-white text-center bg-green-700 p-1 ${isAdmin ? 'rounded-l-lg' : 'rounded-lg mr-4'}`}>
             {username}
           </div>}
