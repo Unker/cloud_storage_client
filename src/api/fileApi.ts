@@ -30,14 +30,16 @@ export const fileApi = createApi({
       }),
     }),
     changeFileComment: builder.mutation<void, { fileId: number; newComment: string }>({
-      query: ({ fileId, newComment }) => ({
-        url: `${ROUTE_API_STORAGE}/${fileId}/`,
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: { comment: newComment },
-      }),
+      query: ({ fileId, newComment }) => {
+        const formData = new FormData();
+        formData.append('comment', newComment);
+
+        return {
+          url: `${ROUTE_API_STORAGE}/${fileId}/`,
+          method: 'PATCH',
+          body: formData,
+        };
+      },
     }),
     uploadFile: builder.mutation<void, { file: File; comment: string }>({
       query: ({ file, comment }) => {

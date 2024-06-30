@@ -122,7 +122,9 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
 
   return (
     <div className='flex-1'>
-      <h2 className="text-2xl mb-4">Files {userId ? `id:${userId}` : username}</h2>
+      <h2 className="text-2xl my-4">
+        Files <span className="font-bold text-xl bg-yellow-200 px-2 py-1 rounded-lg">{userId ? `id:${userId}` : username}</span>
+      </h2>
       <div className="overflow-x-auto">
         {files && files.results.length > 0 ? (
           <table className="min-w-full divide-y divide-gray-200">
@@ -160,7 +162,7 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
                   <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{formatBytes(file.size)}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{format(new Date(file.upload_date), 'PPP')}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{file.last_download_date ? format(new Date(file.last_download_date), 'PPP') : 'Never'}</td>
-                  <td className="px-2 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-left">
                     <button onClick={() => handleDelete(file.id)} className="text-red-600 hover:text-red-900 mr-2"><FaTrash /></button>
                     <button onClick={() => handleRename(file.id)} className="text-yellow-600 hover:text-yellow-900 mr-2"><FaEdit /></button>
                     <button onClick={() => handleDownload(file.id)} className="text-blue-600 hover:text-blue-900 mr-2"><FaCloudDownloadAlt /></button>
@@ -172,9 +174,9 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
                   <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
                       onClick={() => handleToggleLink(file)}
-                      className={`px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                      className={`w-30 px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
                     >
-                      {file.short_link ? 'Удалить ссылку' : 'Создать ссылку'}
+                      {file.short_link ? 'Delete link' : 'Create link'}
                     </button>
 
                   </td>
@@ -198,6 +200,8 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
         isOpen={showDeleteModal}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
+        title="Delete File"
+        message="Are you sure you want to delete this file? This action cannot be undone."
       />
     </div>
   );

@@ -18,7 +18,7 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({ onUploadSucce
       toast.success('File uploaded successfully!');
     }
     if (isError) {
-      toast.success('Error uploading file.');
+      toast.error('Error uploading file.');
     }
   }, [isSuccess, isError]);
 
