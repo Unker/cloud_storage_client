@@ -30,7 +30,7 @@ const Header: React.FC = () => {
           </div>}
         </div>
         {!isAuth ? (
-          <>
+          <div>
             <button
               onClick={() => navigate(ROUTE_LOGIN)}
               className="text-white bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded mr-2"
@@ -43,7 +43,7 @@ const Header: React.FC = () => {
             >
               Sign up
             </button>
-          </>
+          </div>
         ) : (
           <div className="flex justify-center items-center">
             <button
