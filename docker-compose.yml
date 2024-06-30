@@ -5,4 +5,4 @@ services:
       - .:/app
     ports:
       - "3000:3000"
-    command: ["serve", "-s", "dist", "-l", "3000"]
+    command: ["serve", "-s", "dist", "-l", "3000", "--no-clipboard"]
