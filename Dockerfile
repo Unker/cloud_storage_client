@@ -8,17 +8,17 @@ ENV APP_HOME=/app
 # Устанавливаем рабочую директорию
 WORKDIR $APP_HOME
 
-# Копируем файлы проекта
-COPY . $APP_HOME
-
 # Копируем package.json и package-lock.json
-COPY package*.json ./
+COPY package*.json $APP_HOME
 
 # Устанавливаем зависимости и собираем проект
 RUN npm install
 
+# Копируем остальной исходный код в рабочий каталог
+COPY . $APP_HOME
+
 # Копируем остальные файлы проекта
-COPY .env .
+COPY .env $APP_HOME
 
 # Собираем проект
 RUN npm run build
