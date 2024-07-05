@@ -3,11 +3,13 @@ FROM node:20.5.0
 # Отключаем Husky
 ENV HUSKY=0
 
+ENV APP_HOME=/app
+
 # Устанавливаем рабочую директорию
-WORKDIR /app
+WORKDIR $APP_HOME
 
 # Копируем файлы проекта
-COPY . /app
+COPY . $APP_HOME
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./
@@ -16,7 +18,6 @@ COPY package*.json ./
 RUN npm install
 
 # Копируем остальные файлы проекта
-COPY . .
 COPY .env .
 
 # Собираем проект
