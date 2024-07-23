@@ -174,7 +174,7 @@ const FileList: React.FC<FileListProps> = ({ userId, setRefetchUserFiles }) => {
                       onClick={() => handleToggleLink(file)}
                       className={`px-2 py-1 my-1 text-sm rounded ${file.short_link ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
                     >
-                      {file.short_link ? 'Удалить ссылку' : 'Создать ссылку'}
+                      {file.short_link ? 'Create link' : 'Delete link'}
                     </button>
 
                   </td>
