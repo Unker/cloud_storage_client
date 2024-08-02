@@ -23,8 +23,10 @@ COPY .env $APP_HOME
 # Собираем проект
 RUN npm run build
 
+EXPOSE 3000
+
 # Устанавливаем сервер для статических файлов
-RUN npm install -g serve
+# RUN npm install -g serve
 
 # Запускаем приложение
-CMD ["serve", "-s", "dist", "-l", "3000", "--no-clipboard"]
+# CMD ["serve", "-s", "dist", "-l", "3000", "--no-clipboard"]
