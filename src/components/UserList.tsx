@@ -15,7 +15,8 @@ const UserList: React.FC = () => {
   const dispatch = useDispatch();
   const selectedUserId = useSelector((state: RootState) => state.user.selectedUserId);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<number | undefined>(undefined);
+  const [userIdToDelete, setUserIdToDelete] = useState<number | undefined>(undefined);
+  const [userNameToDelete, setUserNameToDelete] = useState<string | undefined>('');
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 15;
   const offset = (currentPage - 1) * limit;
@@ -51,29 +52,32 @@ const UserList: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (user: IUser) => {
     setShowDeleteModal(true);
-    setUserToDelete(userId);
+    setUserIdToDelete(user.id);
+    setUserNameToDelete(user.username);
 
   };
 
   const confirmDelete = async () => {
-    if (userToDelete !== undefined) {
+    if (userIdToDelete !== undefined) {
       try {
-        await deleteUser(userToDelete).unwrap();
-        toast.success(`User with ID ${userToDelete} deleted successfully.`);
+        await deleteUser(userIdToDelete).unwrap();
+        toast.success(`User with ID ${userIdToDelete} deleted successfully.`);
         refetchUsers();
       } catch (error) {
-        toast.error(`Failed to delete user with ID ${userToDelete}: ${error}`);
+        toast.error(`Failed to delete user with ID ${userIdToDelete}: ${error}`);
       }
       setShowDeleteModal(false);
-      setUserToDelete(undefined);
+      setUserIdToDelete(undefined);
+      setUserNameToDelete('');
     }
   };
 
   const cancelDelete = async () => {
     setShowDeleteModal(false);
-    setUserToDelete(undefined);
+    setUserIdToDelete(undefined);
+    setUserNameToDelete('');
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -83,7 +87,7 @@ const UserList: React.FC = () => {
 
   return (
     <>
-      <h2 className='text-xl mb-2'>Список пользователей</h2>
+      <h2 className='text-xl mb-2'>Users list</h2>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -116,21 +120,21 @@ const UserList: React.FC = () => {
                 <td className={`border border-gray-300 text-center text-xl ${user.is_superuser ? 'text-green-700' : 'text-red-400'}`}>
                   {user.is_superuser ? <FaCheckCircle className="mx-auto" /> : <FaTimesCircle className="mx-auto" />}
                 </td>
-                <td className="border border-gray-300 p-2 space-x-2">
+                <td className="border border-gray-300 p-2 space-x-2 text-left">
                   <button
                     onClick={() => handleSelectUser(user.id)}
-                    className={`px-2 py-1 my-1 text-sm rounded ${user.id === selectedUserId ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                    className={`w-24 px-2 py-1 my-1 text-sm rounded ${user.id === selectedUserId ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
                   >
-                    Файлы
+                    {user.id === selectedUserId ? 'Hide files' : 'Show files'}
                   </button>
                   <button
                     onClick={() => handleToggleAdmin(user)}
-                    className={`px-2 py-1 my-1 text-sm rounded ${user.is_staff ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+                    className={`w-32 px-2 py-1 my-1 text-sm rounded ${user.is_staff ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
                   >
-                    {user.is_staff ? 'Убрать админа' : 'Сделать админом'}
+                    {user.is_staff ? 'Remove admin' : 'Make admin'}
                   </button>
                   <button
-                    onClick={() => handleDeleteUser(user.id)}
+                    onClick={() => handleDeleteUser(user)}
                     className="px-2 py-1 text-sm text-red-600 hover:text-red-900"
                   >
                     <FaTrash />
@@ -157,6 +161,8 @@ const UserList: React.FC = () => {
         isOpen={showDeleteModal}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
+        title="Delete user"
+        message={`Are you sure you want to delete user ${userNameToDelete}? This action cannot be undone.`}
       />
 
     </>
